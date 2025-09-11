@@ -11,11 +11,13 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB (use .env variable)
-mongoose.connect(process.env.MONGO_URI, {
+// Connect to MongoDB (use environment variable from Render)
+mongoose.connect(process.env.MONGODB_URI, {  // make sure your .env and Render env variable is MONGODB_URI
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -29,7 +31,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 
-// Simple test route
+// Test route
 app.get("/hello", (req, res) => {
   res.send("Hello from Render API!");
 });
