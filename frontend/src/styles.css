@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+}
+nav {
+  background: #222;
+  color: white;
+  padding: 1rem;
+}
+footer {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+.card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin: 0.5rem;
+  border-radius: 6px;
+}
