@@ -1,7 +1,7 @@
-const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+require("dotenv").config(); // Load .env file
 
 // Import routes
 const authRoutes = require("./routes/authRoutes");
@@ -14,8 +14,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB (set the URI with Firebase config: `firebase functions:config:set mongo.uri="YOUR_MONGO_URI"`)
-mongoose.connect(functions.config().mongo.uri, {
+// Connect to MongoDB (use .env variable)
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -31,8 +31,11 @@ app.use("/api/admin", adminRoutes);
 
 // Simple test route
 app.get("/hello", (req, res) => {
-  res.send("Hello from Firebase API!");
+  res.send("Hello from Render API!");
 });
 
-// Export API as cloud function
-exports.api = functions.https.onRequest(app);
+// Start server (Render expects PORT from environment)
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
