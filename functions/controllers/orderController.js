@@ -1,7 +1,7 @@
 const Order = require("../models/Order");
 
 // Create order (User)
-exports.createOrder = async (req, res) => {
+const createOrder = async (req, res) => {
   try {
     const order = new Order({ ...req.body, user: req.user.id });
     await order.save();
@@ -12,7 +12,7 @@ exports.createOrder = async (req, res) => {
 };
 
 // Get logged-in user's orders
-exports.getUserOrders = async (req, res) => {
+const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user.id }).populate("products.product");
     res.json(orders);
@@ -22,7 +22,7 @@ exports.getUserOrders = async (req, res) => {
 };
 
 // Get all orders (Admin)
-exports.getAllOrders = async (req, res) => {
+const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate("user", "name email");
     res.json(orders);
@@ -32,7 +32,7 @@ exports.getAllOrders = async (req, res) => {
 };
 
 // Update order status (Admin)
-exports.updateOrderStatus = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
@@ -44,4 +44,11 @@ exports.updateOrderStatus = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+module.exports = {
+  createOrder,
+  getUserOrders,
+  getAllOrders,
+  updateOrderStatus,
 };
