@@ -1,13 +1,37 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const orderSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to your User model
+      required: true,
+    },
+    products: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product", // Reference to your Product model
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
+    totalPrice: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["pending", "paid", "shipped", "completed", "cancelled"],
+      default: "pending",
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("User", userSchema);
+// ✅ Prevent OverwriteModelError
+module.exports = mongoose.models.Order || mongoose.model("Order", orderSchema);
