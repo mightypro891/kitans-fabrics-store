@@ -3,7 +3,7 @@ const {
   getDashboardStats,
   manageUsers,
 } = require("../controllers/adminController");
-const { authMiddleware, adminMiddleware } = require("../utils/authMiddleware");
+const { authMiddleware, adminMiddleware } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
