@@ -1,16 +1,24 @@
 const jwt = require("jsonwebtoken");
 
-const authMiddleware = (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // "Bearer TOKEN"
-  if (!token) return res.status(401).json({ message: "No token provided" });
+// Verify user token
+exports.authMiddleware = (req, res, next) => {
+  const token = req.header("Authorization")?.replace("Bearer ", "");
+  if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // { id, role }
+    req.user = decoded;
     next();
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+  } catch (err) {
+    res.status(401).json({ msg: "Token is not valid" });
   }
 };
 
-module.exports = authMiddleware;
+// Check if user is admin
+exports.adminMiddleware = (req, res, next) => {
+  if (req.user && req.user.isAdmin) {
+    next();
+  } else {
+    res.status(403).json({ msg: "Admin access only" });
+  }
+};
