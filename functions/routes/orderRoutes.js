@@ -1,3 +1,4 @@
+// routes/orderRoutes.js
 const express = require("express");
 const router = express.Router();
 const {
@@ -6,17 +7,18 @@ const {
   getAllOrders,
   updateOrderStatus,
 } = require("../controllers/orderController");
+const { authMiddleware, adminMiddleware } = require("../utils/authMiddleware");
 
 // User creates a new order
-router.post("/", createOrder);
+router.post("/", authMiddleware, createOrder);
 
 // User gets their own orders
-router.get("/my-orders", getUserOrders);
+router.get("/my-orders", authMiddleware, getUserOrders);
 
 // Admin gets all orders
-router.get("/", getAllOrders);
+router.get("/", authMiddleware, adminMiddleware, getAllOrders);
 
 // Admin updates order status
-router.put("/:id", updateOrderStatus);
+router.put("/:id", authMiddleware, adminMiddleware, updateOrderStatus);
 
 module.exports = router;
