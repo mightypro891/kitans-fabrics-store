@@ -1,19 +1,24 @@
+// functions/routes/reviewRoutes.js
 const express = require("express");
 const router = express.Router();
 
-// import controller correctly
-const reviewController = require("../controllers/reviewController");
+// Import controller
+const {
+  createReview,
+  getReviewsByProduct,
+  deleteReview,
+} = require("../controllers/reviewController");
 
-// (optional) import your auth middleware if you have one
-const auth = require("../middleware/auth");
+// ✅ Import & destructure middlewares correctly
+const { authMiddleware, adminMiddleware } = require("../utils/authMiddleware");
 
-// Add a new review for a product
-router.post("/:productId", auth, reviewController.createReview);
+// Add a new review for a product (Authenticated users)
+router.post("/:productId", authMiddleware, createReview);
 
-// Get all reviews for a product
-router.get("/:productId", reviewController.getReviewsByProduct);
+// Get all reviews for a product (Public)
+router.get("/:productId", getReviewsByProduct);
 
-// Delete a review (admin only)
-router.delete("/:id", auth, reviewController.deleteReview);
+// Delete a review (Admin only)
+router.delete("/:id", authMiddleware, adminMiddleware, deleteReview);
 
 module.exports = router;
