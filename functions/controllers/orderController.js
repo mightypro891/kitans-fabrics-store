@@ -1,88 +1,59 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// controllers/orderController.js
+const Order = require("../models/Order");
 
-// ✅ REGISTER USER
-const register = async (req, res) => {
+// Create a new order
+const createOrder = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body; // optional role for admin creation
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "User already exists" });
-
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role: role || "user", // default to 'user'
+    const order = new Order({
+      ...req.body,
+      user: req.user?.id || req.body.user, // attach user if using authMiddleware
     });
-
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully" });
+    await order.save();
+    res.status(201).json(order);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({ message: err.message });
   }
 };
 
-// ✅ LOGIN USER
-const login = async (req, res) => {
+// Get orders for the logged-in user
+const getUserOrders = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const orders = await Order.find({ user: req.user.id });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
-    // Find user
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+// Admin: get all orders
+const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find().populate("user", "name email");
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-
-    // Create JWT token
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role }, // include role here
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+// Admin: update order status
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
     );
-
-    res.status(200).json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+    if (!order) return res.status(404).json({ message: "Order not found" });
+    res.json(order);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-// ✅ GET PROFILE
-const getProfile = async (req, res) => {
-  try {
-    // req.user is set in authMiddleware (we stored id/email/role there)
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.status(200).json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({ message: err.message });
   }
 };
 
 module.exports = {
-  register,
-  login,
-  getProfile,
+  createOrder,
+  getUserOrders,
+  getAllOrders,
+  updateOrderStatus,
 };
