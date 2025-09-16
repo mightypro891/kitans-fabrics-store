@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -10,7 +10,14 @@ import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrderManagement from "./pages/OrderManagement";
 
+import { getProducts } from "./api"; // import your API
+
 function App() {
+  useEffect(() => {
+    // Example: fetch products on load
+    getProducts().then(console.log).catch(console.error);
+  }, []);
+
   return (
     <div>
       <Navbar />
