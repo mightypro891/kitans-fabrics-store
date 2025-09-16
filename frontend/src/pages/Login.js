@@ -5,21 +5,31 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Your backend base URL
+  // Your backend URL
   const API_URL = "https://kitans-fabrics-store-1.onrender.com/api";
 
   const handleLogin = async () => {
     try {
+      // Call login endpoint
       const res = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
 
-      // Save token to localStorage for future API calls
-      localStorage.setItem("token", res.data.token);
+      // Save token to localStorage
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
 
-      alert("Login successful: " + res.data.token);
-      console.log("User info:", res.data.user);
+      // Save user info if returned
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
+
+      alert("Login successful!");
+      // Optionally redirect user after login:
+      // window.location.href = "/"; // go to homepage
+
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Login failed");
