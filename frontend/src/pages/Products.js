@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import ProductCard from "../components/ProductCard";
 
 function Products() {
@@ -7,7 +7,9 @@ function Products() {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    axios.get("/api/products").then((res) => setProducts(res.data));
+    api.get("/products")
+      .then((res) => setProducts(res.data))
+      .catch((err) => console.error(err.response?.data?.message || err.message));
   }, []);
 
   const addToCart = (product) => setCart([...cart, product]);
@@ -17,6 +19,7 @@ function Products() {
   return (
     <div>
       <h2>Products</h2>
+      {products.length === 0 && <p>No products yet.</p>}
       {products.map((p) => (
         <ProductCard key={p._id} product={p} addToCart={addToCart} />
       ))}
